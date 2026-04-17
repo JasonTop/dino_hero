@@ -1,46 +1,68 @@
 class_name DamageCalculator
 extends RefCounted
 
-## 戰鬥傷害計算
+## 戰鬥傷害計算（含屬性相剋、被動、裝備加成）
 
 var battle_map: BattleMap
 
 func _init(map: BattleMap) -> void:
 	battle_map = map
 
-## 計算物理傷害
+## 屬性相剋倍率
+static func class_advantage(attacker_class: String, defender_class: String) -> float:
+	var chart := {
+		"striker": ["ranged", "support"],
+		"ranged": ["heavy"],
+		"heavy": ["tank"],
+		"tank": ["striker"],
+		"flyer": ["striker", "tank", "heavy"],
+	}
+	if chart.has(attacker_class):
+		var strong_vs: Array = chart[attacker_class]
+		if defender_class in strong_vs:
+			if attacker_class == "flyer":
+				return 1.2
+			return 1.3
+	return 1.0
+
 func calculate_damage(attacker: Unit, defender: Unit) -> Dictionary:
-	var atk := attacker.stats.attack
-	var def := defender.stats.defense
+	return _calculate(attacker, defender, 1.0, false)
 
-	# 基礎傷害
-	var base_damage := atk * 1.0 - def * 0.5
+func calculate_skill_damage(attacker: Unit, defender: Unit, skill: Skill) -> Dictionary:
+	var is_magical := skill.skill_type == Skill.SkillType.MAGICAL
+	return _calculate(attacker, defender, skill.damage_multiplier, is_magical)
 
-	# 地形防禦加成
+func _calculate(attacker: Unit, defender: Unit, multiplier: float, is_magical: bool) -> Dictionary:
+	var atk: int = attacker.stats.get_effective_magic_attack() if is_magical else attacker.stats.get_effective_attack()
+	var def: int = defender.stats.get_effective_magic_defense() if is_magical else defender.stats.get_effective_defense()
+	var def_factor := 0.4 if is_magical else 0.5
+
+	var base_damage: float = atk * multiplier - def * def_factor
+
+	# 地形防禦
 	var terrain_info := battle_map.get_terrain_info(defender.cell)
 	var terrain_def_bonus: float = terrain_info["def"]
 	base_damage *= (1.0 - terrain_def_bonus)
 
-	# 隨機浮動 (0.9 ~ 1.1)
-	var random_factor := randf_range(0.9, 1.1)
-	base_damage *= random_factor
+	# 屬性相剋
+	var advantage := class_advantage(attacker.stats.class_type, defender.stats.class_type)
+	base_damage *= advantage
 
-	# 保底傷害
+	# 被動技能
+	base_damage = _apply_passive_bonus(attacker, defender, base_damage)
+
+	# 隨機浮動
+	base_damage *= randf_range(0.9, 1.1)
 	var final_damage := maxi(roundi(base_damage), 1)
 
-	# 命中判定
+	# 命中/暴擊
 	var hit_rate := _calculate_hit_rate(attacker, defender)
-	var hit_roll := randf() * 100.0
-	var is_hit := hit_roll <= hit_rate
-
-	# 暴擊判定
+	var is_hit := (randf() * 100.0) <= hit_rate
 	var crit_rate := _calculate_crit_rate(attacker, defender)
-	var crit_roll := randf() * 100.0
-	var is_crit := is_hit and crit_roll <= crit_rate
+	var is_crit := is_hit and (randf() * 100.0) <= crit_rate
 
 	if is_crit:
 		final_damage = roundi(final_damage * 1.5)
-
 	if not is_hit:
 		final_damage = 0
 
@@ -50,38 +72,64 @@ func calculate_damage(attacker: Unit, defender: Unit) -> Dictionary:
 		"is_crit": is_crit,
 		"hit_rate": hit_rate,
 		"crit_rate": crit_rate,
+		"advantage": advantage,
 	}
 
-## 預覽傷害（不含隨機，供 UI 顯示）
-func preview_damage(attacker: Unit, defender: Unit) -> Dictionary:
-	var atk := attacker.stats.attack
-	var def := defender.stats.defense
-	var base_damage := atk * 1.0 - def * 0.5
-
-	var terrain_info := battle_map.get_terrain_info(defender.cell)
-	base_damage *= (1.0 - terrain_info["def"])
-
-	var estimated_damage := maxi(roundi(base_damage), 1)
-	var hit_rate := _calculate_hit_rate(attacker, defender)
-	var crit_rate := _calculate_crit_rate(attacker, defender)
-
-	return {
-		"estimated_damage": estimated_damage,
-		"hit_rate": hit_rate,
-		"crit_rate": crit_rate,
-	}
+func _apply_passive_bonus(attacker: Unit, defender: Unit, damage: float) -> float:
+	for skill_id in attacker.stats.passive_skill_ids:
+		var skill := SkillDatabase.get_skill(skill_id)
+		if skill == null or skill.passive_data.is_empty():
+			continue
+		var kind: String = skill.passive_data.get("kind", "")
+		match kind:
+			"predator":
+				var threshold: float = skill.passive_data.get("threshold", 0.4)
+				var bonus_pct: float = skill.passive_data.get("bonus", 30)
+				var hp_ratio := float(defender.stats.hp) / float(defender.stats.hp_max)
+				if hp_ratio <= threshold:
+					damage *= (1.0 + bonus_pct / 100.0)
+	return damage
 
 func _calculate_hit_rate(attacker: Unit, defender: Unit) -> float:
 	var base_hit := 90.0
-	var spd_diff := attacker.stats.speed - defender.stats.speed * 0.5
-
+	var spd_diff: float = float(attacker.stats.get_effective_speed()) - float(defender.stats.get_effective_speed()) * 0.5
 	var terrain_info := battle_map.get_terrain_info(defender.cell)
 	var evasion_bonus: float = terrain_info["eva"] * 100.0
-
-	var hit := base_hit + spd_diff - evasion_bonus
-	return clampf(hit, 10.0, 100.0)
+	var pack_bonus := _pack_hunt_bonus(attacker, "hit")
+	return clampf(base_hit + spd_diff - evasion_bonus + pack_bonus, 10.0, 100.0)
 
 func _calculate_crit_rate(attacker: Unit, defender: Unit) -> float:
 	var base_crit := 5.0
-	var spd_diff := (attacker.stats.speed - defender.stats.speed) * 0.5
-	return clampf(base_crit + spd_diff, 0.0, 50.0)
+	var spd_diff: float = (float(attacker.stats.get_effective_speed()) - float(defender.stats.get_effective_speed())) * 0.5
+	var pack_bonus := _pack_hunt_bonus(attacker, "crit")
+	return clampf(base_crit + spd_diff + pack_bonus, 0.0, 50.0)
+
+func _pack_hunt_bonus(attacker: Unit, stat: String) -> float:
+	for skill_id in attacker.stats.passive_skill_ids:
+		var skill := SkillDatabase.get_skill(skill_id)
+		if skill == null or skill.passive_data.is_empty():
+			continue
+		if skill.passive_data.get("kind", "") != "pack_hunt":
+			continue
+		var ally_count := 0
+		for neighbor in battle_map.get_neighbors(attacker.cell):
+			var other = battle_map.get_unit_at(neighbor)
+			if other and other != attacker and other.team == attacker.team and other.is_alive():
+				ally_count += 1
+		var per_ally: float = skill.passive_data.get(stat + "_per_ally", 0)
+		return ally_count * per_ally
+	return 0.0
+
+func preview_damage(attacker: Unit, defender: Unit) -> Dictionary:
+	var atk := attacker.stats.get_effective_attack()
+	var def := defender.stats.get_effective_defense()
+	var base_damage: float = atk - def * 0.5
+	var terrain_info := battle_map.get_terrain_info(defender.cell)
+	base_damage *= (1.0 - terrain_info["def"])
+	base_damage *= class_advantage(attacker.stats.class_type, defender.stats.class_type)
+	var estimated_damage := maxi(roundi(base_damage), 1)
+	return {
+		"estimated_damage": estimated_damage,
+		"hit_rate": _calculate_hit_rate(attacker, defender),
+		"crit_rate": _calculate_crit_rate(attacker, defender),
+	}

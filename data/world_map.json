@@ -1,0 +1,89 @@
+{
+  "map_size": [1280, 600],
+  "nodes": [
+    {
+      "id": "ch01",
+      "type": "main",
+      "title": "第一章：密林襲擊",
+      "description": "擊退霸王帝國的偵察隊。",
+      "chapter_id": "ch01",
+      "position": [120, 380],
+      "recommended_level": 3,
+      "unlock": [],
+      "connects": ["ch02", "side01", "event01"]
+    },
+    {
+      "id": "side01",
+      "type": "side",
+      "title": "支線：迷失的幼龍",
+      "description": "幫助一隻與母親走散的三角龍幼崽。",
+      "chapter_id": "side01",
+      "position": [260, 500],
+      "recommended_level": 4,
+      "unlock": ["ch01"],
+      "connects": ["ch02"]
+    },
+    {
+      "id": "event01",
+      "type": "event",
+      "title": "神秘遺跡",
+      "description": "密林深處有一座遠古遺跡，探索後可能有收穫。",
+      "position": [280, 260],
+      "unlock": ["ch01"],
+      "connects": ["shop01"]
+    },
+    {
+      "id": "shop01",
+      "type": "shop",
+      "title": "遊牧商隊",
+      "description": "翼龍商人在此擺攤，購買道具與裝備。",
+      "position": [460, 200],
+      "unlock": ["event01"],
+      "connects": ["ch02"]
+    },
+    {
+      "id": "ch02",
+      "type": "main",
+      "title": "第二章：平原遭遇",
+      "description": "在開闊平原與暴龍部隊首次正面衝突。",
+      "chapter_id": "ch02",
+      "position": [520, 380],
+      "recommended_level": 5,
+      "unlock": ["ch01"],
+      "connects": ["ch03", "side02"]
+    },
+    {
+      "id": "side02",
+      "type": "side",
+      "title": "支線：水源爭奪",
+      "description": "協助慈母龍群保護水源地。",
+      "chapter_id": "side02",
+      "position": [700, 500],
+      "recommended_level": 6,
+      "unlock": ["ch02"],
+      "connects": ["ch03"]
+    },
+    {
+      "id": "ch03",
+      "type": "main",
+      "title": "第三章：山麓會盟",
+      "description": "前往盾甲聯邦，試圖與三角龍結盟。",
+      "chapter_id": "ch03",
+      "position": [900, 380],
+      "recommended_level": 7,
+      "unlock": ["ch02"],
+      "connects": ["ch04"]
+    },
+    {
+      "id": "ch04",
+      "type": "boss",
+      "title": "第四章 BOSS：霸王雷顎",
+      "description": "霸王帝國統帥雷顎親臨戰場，準備好迎戰最強大的敵人！",
+      "chapter_id": "ch04",
+      "position": [1120, 380],
+      "recommended_level": 10,
+      "unlock": ["ch03"],
+      "connects": []
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "chapter_id": "ch01",
+  "title": "第一章：密林襲擊",
+  "next_chapter": "",
+  "pre_battle": [
+    {
+      "speaker": "narrator",
+      "text": "白堊紀末期，密林深處。疾爪氏族的營地邊緣，傳來了不祥的腳步聲……"
+    },
+    {
+      "speaker": "deinonychus",
+      "text": "首領！偵察回報——霸王帝國的偵察隊已經逼近我們的獵場邊界了！"
+    },
+    {
+      "speaker": "raptor",
+      "text": "雷顎那老傢伙終於把手伸到這裡了嗎……疾風，你認為該怎麼辦？"
+    },
+    {
+      "speaker": "deinonychus",
+      "text": "如果讓他們活著回去，暴龍大軍不出三日就會壓境。但如果我們先發制人——"
+    },
+    {
+      "speaker": "triceratops",
+      "text": "銳牙大人，請下令吧。鐵壁部隊已經準備就緒。"
+    },
+    {
+      "speaker": "raptor",
+      "text": "那群偵察兵看起來並非都是自願的……我們該怎麼處理？",
+      "choices": [
+        {
+          "text": "全力殲滅，不留活口（-5 路線值）",
+          "alignment": -5,
+          "next": "route_conquest"
+        },
+        {
+          "text": "儘量活捉，問出情報（+5 路線值）",
+          "alignment": 5,
+          "next": "route_harmony"
+        },
+        {
+          "text": "只擊退他們就好（0）",
+          "alignment": 0,
+          "next": "route_neutral"
+        }
+      ]
+    },
+    {
+      "id": "route_conquest",
+      "speaker": "raptor",
+      "text": "一個不留。讓雷顎知道，密林不是他能隨意踏足的地方。",
+      "next": "battle_start"
+    },
+    {
+      "id": "route_harmony",
+      "speaker": "raptor",
+      "text": "儘量活捉。他們也許只是被迫服役的可憐恐龍。",
+      "next": "battle_start"
+    },
+    {
+      "id": "route_neutral",
+      "speaker": "raptor",
+      "text": "擊退即可。我不想浪費體力在這些雜兵身上。",
+      "next": "battle_start"
+    },
+    {
+      "id": "battle_start",
+      "speaker": "raptor",
+      "text": "各部就位——戰鬥開始！"
+    }
+  ],
+  "post_battle": [
+    {
+      "speaker": "deinonychus",
+      "text": "敵方偵察隊已被殲滅，首領。"
+    },
+    {
+      "speaker": "raptor",
+      "text": "很好。這只是開始——雷顎不會善罷甘休的。"
+    },
+    {
+      "speaker": "triceratops",
+      "text": "我們是否該主動出擊，破壞他們的前哨站？"
+    },
+    {
+      "speaker": "raptor",
+      "text": "不急。先集結部族，準備好再說。疾風，去通知各分支——大戰將至。"
+    },
+    {
+      "speaker": "narrator",
+      "text": "疾爪氏族踏上了崛起之路……"
+    }
+  ]
+}

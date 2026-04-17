@@ -17,7 +17,15 @@ func show_damage(amount: int, is_crit: bool = false, is_miss: bool = false) -> v
 		label.text = str(amount)
 		label.modulate = Color.WHITE
 
-	# 動畫：上浮 + 淡出
+	_play_animation()
+
+## 顯示任意文字（EXP/MP 回復等）
+func show_text(txt: String) -> void:
+	label.text = txt
+	label.modulate = Color.CYAN
+	_play_animation()
+
+func _play_animation() -> void:
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(self, "position:y", position.y - 40, 0.8).set_ease(Tween.EASE_OUT)

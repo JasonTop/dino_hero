@@ -1,0 +1,11 @@
+{
+  "chapter_id": "side02",
+  "title": "支線：水源爭奪",
+  "pre_battle": [
+    {"speaker": "narrator", "text": "乾旱時節，水源地成為了各方勢力覬覦的戰略點。"},
+    {"speaker": "deinonychus", "text": "那群迅猛龍看起來像是偷獵者，並非正規軍。"}
+  ],
+  "post_battle": [
+    {"speaker": "raptor", "text": "水源地保住了，慈母龍群族會記得我們的幫助。"}
+  ]
+}

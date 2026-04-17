@@ -1,0 +1,11 @@
+{
+  "chapter_id": "ch02",
+  "title": "第二章：平原遭遇",
+  "pre_battle": [
+    {"speaker": "deinonychus", "text": "首領，前方的平原上有暴龍部隊的足跡。"},
+    {"speaker": "raptor", "text": "開闊地形對我們不利，但也無處可躲——全員戒備。"}
+  ],
+  "post_battle": [
+    {"speaker": "raptor", "text": "我們成功擋下了暴龍的前鋒，但這只是個開始。"}
+  ]
+}

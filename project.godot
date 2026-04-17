@@ -23,6 +23,11 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameManager="*res://scripts/core/game_manager.gd"
+SkillDatabase="*res://scripts/combat/skill_database.gd"
+ItemDatabase="*res://scripts/items/item_database.gd"
+Inventory="*res://scripts/items/inventory.gd"
+StoryManager="*res://scripts/story/story_manager.gd"
+ChapterDatabase="*res://scripts/story/chapter_database.gd"
 
 [display]
 

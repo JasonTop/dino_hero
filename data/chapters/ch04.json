@@ -1,0 +1,12 @@
+{
+  "chapter_id": "ch04",
+  "title": "第四章：霸王來襲",
+  "pre_battle": [
+    {"speaker": "narrator", "text": "霸王帝國終於派出主力部隊——山脈震動，樹木傾倒。"},
+    {"speaker": "trex", "text": "疾爪氏族的小頭目——你就是銳牙？不過是個小崽子嘛。"},
+    {"speaker": "raptor", "text": "雷顎……今日就是你霸業的終點！"}
+  ],
+  "post_battle": [
+    {"speaker": "raptor", "text": "擊退了雷顎的先鋒，但這還不是結束……"}
+  ]
+}

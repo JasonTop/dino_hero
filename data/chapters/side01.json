@@ -1,0 +1,11 @@
+{
+  "chapter_id": "side01",
+  "title": "支線：迷失的幼龍",
+  "pre_battle": [
+    {"speaker": "maiasaura", "text": "救救那隻幼崽！牠就要被肉食龍追上了！"},
+    {"speaker": "raptor", "text": "不能見死不救——全員上！"}
+  ],
+  "post_battle": [
+    {"speaker": "maiasaura", "text": "謝謝你們……這個小東西是聯邦長老的後裔，這份恩情他們不會忘記的。"}
+  ]
+}

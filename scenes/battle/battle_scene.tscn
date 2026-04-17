@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://battlescn001"]
+[gd_scene load_steps=13 format=3 uid="uid://battlescn001"]
 
 [ext_resource type="Script" path="res://scripts/core/battle_scene.gd" id="1_scene"]
 [ext_resource type="Script" path="res://scripts/map/battle_map.gd" id="2_map"]
@@ -9,6 +9,9 @@
 [ext_resource type="Script" path="res://scripts/ui/action_menu.gd" id="7_menu"]
 [ext_resource type="Script" path="res://scripts/ui/battle_hud.gd" id="8_hud"]
 [ext_resource type="Script" path="res://scripts/map/grid_drawer.gd" id="9_grid"]
+[ext_resource type="Script" path="res://scripts/ui/skill_menu.gd" id="10_skill"]
+[ext_resource type="Script" path="res://scripts/ui/item_menu.gd" id="11_item"]
+[ext_resource type="Script" path="res://scripts/ui/level_up_popup.gd" id="12_levelup"]
 
 [node name="BattleScene" type="Node2D"]
 script = ExtResource("1_scene")
@@ -54,8 +57,8 @@ theme_override_font_sizes/font_size = 28
 visible = false
 offset_left = 16.0
 offset_top = 16.0
-offset_right = 220.0
-offset_bottom = 200.0
+offset_right = 240.0
+offset_bottom = 220.0
 
 [node name="VBox" type="VBoxContainer" parent="BattleHUD/UnitInfoPanel"]
 layout_mode = 2
@@ -92,6 +95,15 @@ offset_right = 400.0
 offset_bottom = 716.0
 text = "平地  DEF:0%  EVA:0%"
 
+[node name="DifficultyLabel" type="Label" parent="BattleHUD"]
+offset_left = 1120.0
+offset_top = 16.0
+offset_right = 1264.0
+offset_bottom = 40.0
+horizontal_alignment = 2
+text = "難度：普通"
+modulate = Color(1, 0.9, 0.5, 1)
+
 [node name="BattleResultPanel" type="PanelContainer" parent="BattleHUD"]
 visible = false
 offset_left = 390.0
@@ -111,10 +123,10 @@ layer = 11
 
 [node name="ActionMenu" type="PanelContainer" parent="UILayer"]
 visible = false
-offset_left = 540.0
-offset_top = 280.0
-offset_right = 740.0
-offset_bottom = 400.0
+offset_left = 1040.0
+offset_top = 240.0
+offset_right = 1260.0
+offset_bottom = 480.0
 script = ExtResource("7_menu")
 
 [node name="VBox" type="VBoxContainer" parent="UILayer/ActionMenu"]
@@ -124,9 +136,97 @@ layout_mode = 2
 layout_mode = 2
 text = "攻擊"
 
+[node name="SkillButton" type="Button" parent="UILayer/ActionMenu/VBox"]
+layout_mode = 2
+text = "技能"
+
+[node name="ItemButton" type="Button" parent="UILayer/ActionMenu/VBox"]
+layout_mode = 2
+text = "道具"
+
 [node name="WaitButton" type="Button" parent="UILayer/ActionMenu/VBox"]
 layout_mode = 2
 text = "待機"
+
+[node name="SkillMenu" type="PanelContainer" parent="UILayer"]
+visible = false
+offset_left = 320.0
+offset_top = 200.0
+offset_right = 960.0
+offset_bottom = 520.0
+script = ExtResource("10_skill")
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/SkillMenu"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UILayer/SkillMenu/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "選擇技能"
+
+[node name="SkillList" type="VBoxContainer" parent="UILayer/SkillMenu/VBox"]
+layout_mode = 2
+
+[node name="ItemMenu" type="PanelContainer" parent="UILayer"]
+visible = false
+offset_left = 320.0
+offset_top = 200.0
+offset_right = 960.0
+offset_bottom = 520.0
+script = ExtResource("11_item")
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/ItemMenu"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UILayer/ItemMenu/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "選擇道具"
+
+[node name="ItemList" type="VBoxContainer" parent="UILayer/ItemMenu/VBox"]
+layout_mode = 2
+
+[node name="LevelUpPopup" type="Control" parent="UILayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("12_levelup")
+
+[node name="Dimmer" type="ColorRect" parent="UILayer/LevelUpPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="Panel" type="PanelContainer" parent="UILayer/LevelUpPopup"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -180.0
+offset_right = 250.0
+offset_bottom = 180.0
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/LevelUpPopup/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UILayer/LevelUpPopup/Panel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+text = "等級提升！"
+
+[node name="Info" type="Label" parent="UILayer/LevelUpPopup/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = ""
+
+[node name="CloseButton" type="Button" parent="UILayer/LevelUpPopup/Panel/VBox"]
+layout_mode = 2
+text = "確定"
 
 [node name="BattleManager" type="Node" parent="."]
 script = ExtResource("4_bm")

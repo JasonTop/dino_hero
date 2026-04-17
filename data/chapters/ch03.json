@@ -1,0 +1,11 @@
+{
+  "chapter_id": "ch03",
+  "title": "第三章：山麓會盟",
+  "pre_battle": [
+    {"speaker": "triceratops", "text": "首領，前方就是盾甲聯邦的邊境了。"},
+    {"speaker": "raptor", "text": "他們的哨兵似乎把我們當成敵人了——看來得先證明實力。"}
+  ],
+  "post_battle": [
+    {"speaker": "raptor", "text": "這場比試應該能讓鐵壁一族的長老們正視我們了。"}
+  ]
+}

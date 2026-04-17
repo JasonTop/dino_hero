@@ -14,10 +14,13 @@ extends CanvasLayer
 @onready var terrain_label: Label = $TerrainLabel
 @onready var battle_result_panel: PanelContainer = $BattleResultPanel
 @onready var result_label: Label = $BattleResultPanel/ResultLabel
+@onready var difficulty_label: Label = $DifficultyLabel
 
 func _ready() -> void:
 	unit_info_panel.visible = false
 	battle_result_panel.visible = false
+	if difficulty_label:
+		difficulty_label.text = "難度：" + GameManager.get_difficulty_name()
 
 func show_turn_banner(text: String) -> void:
 	turn_label.text = text
@@ -34,11 +37,12 @@ func show_unit_info(unit: Unit) -> void:
 		return
 	unit_info_panel.visible = true
 	unit_name_label.text = unit.stats.display_name + " Lv." + str(unit.stats.level)
-	unit_hp_label.text = "HP: " + str(unit.stats.hp) + "/" + str(unit.stats.hp_max)
-	unit_atk_label.text = "ATK: " + str(unit.stats.attack)
-	unit_def_label.text = "DEF: " + str(unit.stats.defense)
-	unit_spd_label.text = "SPD: " + str(unit.stats.speed)
-	unit_mov_label.text = "MOV: " + str(unit.stats.movement)
+	var exp_next := UnitStats.exp_required_for_level(unit.stats.level)
+	unit_hp_label.text = "HP: %d/%d  MP: %d/%d" % [unit.stats.hp, unit.stats.hp_max, unit.stats.mp, unit.stats.mp_max]
+	unit_atk_label.text = "ATK: %d  DEF: %d" % [unit.stats.get_effective_attack(), unit.stats.get_effective_defense()]
+	unit_def_label.text = "MATK: %d  MDEF: %d" % [unit.stats.get_effective_magic_attack(), unit.stats.get_effective_magic_defense()]
+	unit_spd_label.text = "SPD: %d  MOV: %d" % [unit.stats.get_effective_speed(), unit.stats.get_effective_movement()]
+	unit_mov_label.text = "EXP: %d/%d" % [unit.stats.exp, exp_next]
 
 func hide_unit_info() -> void:
 	unit_info_panel.visible = false
