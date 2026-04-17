@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://actmenu0001"]
+
+[ext_resource type="Script" path="res://scripts/ui/action_menu.gd" id="1_menu"]
+
+[node name="ActionMenu" type="PanelContainer"]
+visible = false
+offset_left = 540.0
+offset_top = 280.0
+offset_right = 740.0
+offset_bottom = 400.0
+script = ExtResource("1_menu")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AttackButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "攻擊"
+
+[node name="WaitButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "待機"

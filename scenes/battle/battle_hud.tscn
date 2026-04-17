@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://battlehud001"]
+
+[ext_resource type="Script" path="res://scripts/ui/battle_hud.gd" id="1_hud"]
+
+[node name="BattleHUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="TurnLabel" type="Label" parent="."]
+visible = false
+offset_left = 400.0
+offset_top = 300.0
+offset_right = 880.0
+offset_bottom = 360.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 28
+
+[node name="UnitInfoPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 220.0
+offset_bottom = 200.0
+
+[node name="VBox" type="VBoxContainer" parent="UnitInfoPanel"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "名稱"
+
+[node name="HPLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+text = "HP: 0/0"
+
+[node name="ATKLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+text = "ATK: 0"
+
+[node name="DEFLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+text = "DEF: 0"
+
+[node name="SPDLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+text = "SPD: 0"
+
+[node name="MOVLabel" type="Label" parent="UnitInfoPanel/VBox"]
+layout_mode = 2
+text = "MOV: 0"
+
+[node name="TerrainLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 690.0
+offset_right = 400.0
+offset_bottom = 716.0
+text = "平地  DEF:0%  EVA:0%"
+
+[node name="BattleResultPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 390.0
+offset_top = 260.0
+offset_right = 890.0
+offset_bottom = 380.0
+
+[node name="ResultLabel" type="Label" parent="BattleResultPanel"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 40
+text = "勝利！"
