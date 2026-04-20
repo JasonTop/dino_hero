@@ -5,6 +5,7 @@ extends Control
 const EventPopupRes := preload("res://scenes/world_map/event_popup.tscn")
 const ShopPopupRes := preload("res://scenes/world_map/shop_popup.tscn")
 const SaveLoadScene := preload("res://scenes/ui/save_load_screen.tscn")
+const PartyScene := preload("res://scenes/ui/party_screen.tscn")
 
 const NODE_SIZE := Vector2(64, 64)
 
@@ -42,6 +43,10 @@ func _ready() -> void:
 	if save_btn:
 		save_btn.pressed.connect(_on_save_pressed)
 
+	var party_btn := get_node_or_null("UILayer/TopBar/HBox/PartyButton") as Button
+	if party_btn:
+		party_btn.pressed.connect(_on_party_pressed)
+
 	_load_map_data()
 	_build_map()
 	_refresh_status()
@@ -53,6 +58,11 @@ func _on_save_pressed() -> void:
 	if SaveLoadScreen.is_open():
 		return
 	SaveLoadScreen.open_singleton(self, SaveLoadScene, SaveLoadScreen.Mode.SAVE)
+
+func _on_party_pressed() -> void:
+	if PartyScreen.is_open():
+		return
+	PartyScreen.open_singleton(self, PartyScene)
 
 func _load_map_data() -> void:
 	var path := "res://data/world_map.json"

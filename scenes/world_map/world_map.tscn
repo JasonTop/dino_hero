@@ -43,6 +43,10 @@ theme_override_constants/separation = 24
 layout_mode = 2
 text = "返回"
 
+[node name="PartyButton" type="Button" parent="UILayer/TopBar/HBox"]
+layout_mode = 2
+text = "隊伍"
+
 [node name="SaveButton" type="Button" parent="UILayer/TopBar/HBox"]
 layout_mode = 2
 text = "存檔"

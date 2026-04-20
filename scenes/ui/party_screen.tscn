@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://doj77mk0or1qq"]
+
+[ext_resource type="Script" path="res://scripts/ui/party_screen.gd" id="1_party"]
+
+[node name="PartyScreen" type="CanvasLayer"]
+layer = 80
+script = ExtResource("1_party")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Dimmer" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.8)
+
+[node name="HBox" type="HBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -580.0
+offset_top = -320.0
+offset_right = 580.0
+offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="LeftPanel" type="PanelContainer" parent="Root/HBox"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/HBox/LeftPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Root/HBox/LeftPanel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "隊伍成員"
+
+[node name="Scroll" type="ScrollContainer" parent="Root/HBox/LeftPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MemberList" type="VBoxContainer" parent="Root/HBox/LeftPanel/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="CloseButton" type="Button" parent="Root/HBox/LeftPanel/VBox"]
+layout_mode = 2
+text = "關閉 (Esc)"
+
+[node name="RightPanel" type="PanelContainer" parent="Root/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="VBox" type="VBoxContainer" parent="Root/HBox/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="VBoxContainer" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Root/HBox/RightPanel/VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "銳牙  Lv.3"
+
+[node name="ClassLabel" type="Label" parent="Root/HBox/RightPanel/VBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "突擊型"
+
+[node name="Separator1" type="HSeparator" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="StatsLabel" type="RichTextLabel" parent="Root/HBox/RightPanel/VBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+theme_override_font_sizes/normal_font_size = 14
+text = ""
+
+[node name="Separator2" type="HSeparator" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="EquipRow" type="HBoxContainer" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EquipLabel" type="Label" parent="Root/HBox/RightPanel/VBox/EquipRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "（未裝備）"
+
+[node name="ChangeButton" type="Button" parent="Root/HBox/RightPanel/VBox/EquipRow"]
+layout_mode = 2
+text = "更換"
+
+[node name="UnequipButton" type="Button" parent="Root/HBox/RightPanel/VBox/EquipRow"]
+layout_mode = 2
+text = "卸下"
+
+[node name="Separator3" type="HSeparator" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="ActiveTitle" type="Label" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "主動技能"
+
+[node name="ActiveSkills" type="VBoxContainer" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="PassiveTitle" type="Label" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "被動技能"
+
+[node name="PassiveSkills" type="VBoxContainer" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="Separator4" type="HSeparator" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+
+[node name="EvolveButton" type="Button" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+disabled = true
+text = "進化"
+
+[node name="EvolveInfo" type="Label" parent="Root/HBox/RightPanel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+text = "—"
