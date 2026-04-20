@@ -45,6 +45,14 @@ func _process_next_unit(player_units: Array[Unit]) -> void:
 		_process_next_unit(player_units)
 		return
 
+	# 狀態控制：麻痺/沉睡可能跳過行動
+	if unit.should_skip_turn():
+		_show_skipped_text(unit)
+		unit.end_action()
+		await get_tree().create_timer(0.4).timeout
+		_process_next_unit(player_units)
+		return
+
 	ai_unit_action_start.emit(unit)
 
 	# 找最佳目標和行動
@@ -170,6 +178,13 @@ func _decide_action(unit: Unit, player_units: Array[Unit]) -> Dictionary:
 
 func _manhattan_distance(a: Vector2i, b: Vector2i) -> float:
 	return float(absi(a.x - b.x) + absi(a.y - b.y))
+
+func _show_skipped_text(unit: Unit) -> void:
+	var popup_scene := preload("res://scenes/battle/damage_popup.tscn")
+	var popup: DamagePopup = popup_scene.instantiate()
+	get_tree().current_scene.add_child(popup)
+	popup.global_position = unit.global_position + Vector2(0, -20)
+	popup.show_text("無法行動")
 
 ## 計算該位置有多少敵人可以攻擊到（威脅數）
 func _count_threats(cell: Vector2i, enemies: Array[Unit], own_team: int) -> int:

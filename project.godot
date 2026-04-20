@@ -24,6 +24,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scripts/core/game_manager.gd"
 SkillDatabase="*res://scripts/combat/skill_database.gd"
+StatusEffectDatabase="*res://scripts/combat/status_effect_database.gd"
 ItemDatabase="*res://scripts/items/item_database.gd"
 Inventory="*res://scripts/items/inventory.gd"
 StoryManager="*res://scripts/story/story_manager.gd"

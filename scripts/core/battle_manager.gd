@@ -100,10 +100,12 @@ func _start_player_turn() -> void:
 	for u in player_units:
 		if u.is_alive():
 			u.reset_turn()
+			_tick_unit_status(u)
 
 	cursor.set_active(true)
 	turn_changed.emit(turn_number, "player")
 	hud.show_turn_banner("第 " + str(turn_number) + " 回合 — 我方行動")
+	_check_battle_end()
 
 func _start_enemy_turn() -> void:
 	current_phase = Phase.ENEMY_TURN
@@ -114,8 +116,12 @@ func _start_enemy_turn() -> void:
 	for u in enemy_units:
 		if u.is_alive():
 			u.reset_turn()
+			_tick_unit_status(u)
 
 	await get_tree().create_timer(1.0).timeout
+	_check_battle_end()
+	if current_phase == Phase.BATTLE_OVER:
+		return
 
 	var alive_enemies: Array[Unit] = []
 	for u in enemy_units:
@@ -218,6 +224,12 @@ func _handle_idle_select(cell: Vector2i) -> void:
 	var unit = battle_map.get_unit_at(cell)
 	if unit and unit is Unit:
 		if unit.team == Unit.Team.PLAYER and not unit.has_acted and unit.is_alive():
+			# 狀態控制：麻痺/沉睡若觸發則直接跳過此單位
+			if unit.should_skip_turn():
+				_show_floating_text(unit, "無法行動")
+				unit.end_action()
+				_check_player_turn_end()
+				return
 			tile_highlighter.clear_threat_range()
 			_select_unit(unit)
 		elif unit.is_alive():
@@ -461,7 +473,9 @@ func _execute_self_skill(caster: Unit, skill: Skill) -> void:
 
 	caster.stats.mp = maxi(caster.stats.mp - skill.mp_cost, 0)
 
-	# BUFF：這裡先簡化為立即視覺提示，實際狀態系統可日後加入
+	# BUFF：實際施加狀態
+	if skill.status_effect != "":
+		caster.apply_status(skill.status_effect, skill.status_duration)
 	_show_floating_text(caster, skill.display_name + "!")
 
 	await get_tree().create_timer(0.5).timeout
@@ -486,6 +500,9 @@ func _execute_skill_on_target(caster: Unit, skill: Skill, target: Unit) -> void:
 				_show_damage_popup(target, result)
 				if result["is_hit"]:
 					target.take_damage(result["damage"])
+					# 附帶狀態效果（如毒霧、燃燒）
+					if skill.status_effect != "" and target.is_alive():
+						target.apply_status(skill.status_effect, skill.status_duration)
 					killed = not target.is_alive()
 				await get_tree().create_timer(0.25).timeout
 
@@ -495,6 +512,16 @@ func _execute_skill_on_target(caster: Unit, skill: Skill, target: Unit) -> void:
 				amount += roundi(caster.stats.get_effective_magic_attack() * skill.heal_ratio)
 			target.heal(amount)
 			_show_heal_popup(target, amount)
+
+		Skill.SkillType.BUFF:
+			if skill.status_effect != "":
+				target.apply_status(skill.status_effect, skill.status_duration)
+			_show_floating_text(target, skill.display_name + "!")
+
+		Skill.SkillType.DEBUFF:
+			if skill.status_effect != "":
+				target.apply_status(skill.status_effect, skill.status_duration)
+			_show_floating_text(target, skill.display_name + "!")
 
 	await get_tree().create_timer(0.3).timeout
 
@@ -631,3 +658,22 @@ func _show_floating_text(target: Unit, text: String) -> void:
 	get_tree().current_scene.add_child(popup)
 	popup.global_position = target.global_position + Vector2(0, -20)
 	popup.show_text(text)
+
+## 回合開始時處理狀態 tick（DOT/HOT 傷害/治療 + 倒數）
+func _tick_unit_status(unit: Unit) -> void:
+	if unit.status_effects.is_empty():
+		return
+	var result := unit.tick_status()
+	if result["damage"] > 0:
+		var popup_scene := preload("res://scenes/battle/damage_popup.tscn")
+		var popup: DamagePopup = popup_scene.instantiate()
+		get_tree().current_scene.add_child(popup)
+		popup.global_position = unit.global_position + Vector2(0, -20)
+		popup.show_damage(result["damage"])
+	if result["heal"] > 0:
+		var popup_scene := preload("res://scenes/battle/damage_popup.tscn")
+		var popup: DamagePopup = popup_scene.instantiate()
+		get_tree().current_scene.add_child(popup)
+		popup.global_position = unit.global_position + Vector2(0, -20)
+		popup.show_damage(result["heal"])
+		popup.modulate = Color(0.4, 1.0, 0.4)

@@ -33,9 +33,15 @@ func calculate_skill_damage(attacker: Unit, defender: Unit, skill: Skill) -> Dic
 	return _calculate(attacker, defender, skill.damage_multiplier, is_magical)
 
 func _calculate(attacker: Unit, defender: Unit, multiplier: float, is_magical: bool) -> Dictionary:
-	var atk: int = attacker.stats.get_effective_magic_attack() if is_magical else attacker.stats.get_effective_attack()
-	var def: int = defender.stats.get_effective_magic_defense() if is_magical else defender.stats.get_effective_defense()
+	var atk_base: int = attacker.stats.get_effective_magic_attack() if is_magical else attacker.stats.get_effective_attack()
+	var def_base: int = defender.stats.get_effective_magic_defense() if is_magical else defender.stats.get_effective_defense()
 	var def_factor := 0.4 if is_magical else 0.5
+
+	# 狀態異常對攻防的影響
+	var atk_stat_name := "matk" if is_magical else "atk"
+	var def_stat_name := "mdef" if is_magical else "def"
+	var atk := float(atk_base) * attacker.get_stat_multiplier(atk_stat_name)
+	var def := float(def_base) * defender.get_stat_multiplier(def_stat_name)
 
 	var base_damage: float = atk * multiplier - def * def_factor
 
@@ -92,11 +98,15 @@ func _apply_passive_bonus(attacker: Unit, defender: Unit, damage: float) -> floa
 
 func _calculate_hit_rate(attacker: Unit, defender: Unit) -> float:
 	var base_hit := 90.0
-	var spd_diff: float = float(attacker.stats.get_effective_speed()) - float(defender.stats.get_effective_speed()) * 0.5
+	var attacker_spd := float(attacker.stats.get_effective_speed()) * attacker.get_stat_multiplier("spd")
+	var defender_spd := float(defender.stats.get_effective_speed()) * defender.get_stat_multiplier("spd")
+	var spd_diff: float = attacker_spd - defender_spd * 0.5
 	var terrain_info := battle_map.get_terrain_info(defender.cell)
 	var evasion_bonus: float = terrain_info["eva"] * 100.0
 	var pack_bonus := _pack_hunt_bonus(attacker, "hit")
-	return clampf(base_hit + spd_diff - evasion_bonus + pack_bonus, 10.0, 100.0)
+	# 攻擊方的 accuracy_mod 加在命中；防禦方的 accuracy_mod 減少命中（例如被盲目）
+	var acc_mod := attacker.get_accuracy_mod()
+	return clampf(base_hit + spd_diff - evasion_bonus + pack_bonus + acc_mod, 10.0, 100.0)
 
 func _calculate_crit_rate(attacker: Unit, defender: Unit) -> float:
 	var base_crit := 5.0

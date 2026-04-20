@@ -120,13 +120,14 @@ static func create_stats(dino_type: DinoType, dino_name: String = "", lv: int = 
 				35, 12, 7, 5, 15, 8, 12, 5, 1, 3)
 			_set_growth(stats, Vector2i(2, 4), Vector2i(1, 2), Vector2i(1, 2),
 				Vector2i(2, 3), Vector2i(1, 2), Vector2i(1, 2))
+			stats.active_skill_ids = ["venom_spit"] as Array[String]
 
 		DinoType.PARASAUROLOPHUS:
 			_set_base(stats, dino_name, "副櫛龍", "ranged",
 				40, 14, 6, 6, 13, 10, 10, 5, 1, 2)
 			_set_growth(stats, Vector2i(3, 4), Vector2i(1, 2), Vector2i(1, 2),
 				Vector2i(2, 3), Vector2i(2, 3), Vector2i(1, 2))
-			stats.active_skill_ids = ["heal_lick"] as Array[String]
+			stats.active_skill_ids = ["heal_lick", "sonic_blast"] as Array[String]
 
 		# ===== 飛行型 =====
 		DinoType.PTERANODON:

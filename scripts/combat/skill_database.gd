@@ -76,6 +76,22 @@ func _register_all_skills() -> void:
 		"mp": 8, "range_max": 1, "heal_ratio": 1.5,
 	})
 
+	# ===== 雙冠龍毒霧 =====
+	_register({
+		"id": "venom_spit", "name": "毒液噴射",
+		"desc": "遠程攻擊並使目標中毒 3 回合",
+		"type": Skill.SkillType.MAGICAL, "target": Skill.TargetType.SINGLE_ENEMY,
+		"mp": 10, "range_max": 3, "mult": 1.0,
+		"status": "poison", "duration": 3,
+	})
+	_register({
+		"id": "sonic_blast", "name": "音波震擊",
+		"desc": "特殊攻擊並使目標進入盲目狀態",
+		"type": Skill.SkillType.MAGICAL, "target": Skill.TargetType.SINGLE_ENEMY,
+		"mp": 8, "range_max": 2, "mult": 0.9,
+		"status": "blind", "duration": 2,
+	})
+
 func _register(d: Dictionary) -> void:
 	var s := Skill.new()
 	s.skill_id = d["id"]
