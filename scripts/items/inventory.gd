@@ -62,3 +62,18 @@ func spend_gold(amount: int) -> bool:
 
 func get_gold() -> int:
 	return gold
+
+## ===== 序列化 =====
+func to_dict() -> Dictionary:
+	return {
+		"items": _items.duplicate(),
+		"gold": gold,
+	}
+
+func from_dict(d: Dictionary) -> void:
+	_items.clear()
+	var items_data: Dictionary = d.get("items", {})
+	for k in items_data:
+		_items[str(k)] = int(items_data[k])
+	gold = int(d.get("gold", 0))
+	gold_changed.emit(gold)

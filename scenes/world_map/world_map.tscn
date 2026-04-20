@@ -43,6 +43,10 @@ theme_override_constants/separation = 24
 layout_mode = 2
 text = "返回"
 
+[node name="SaveButton" type="Button" parent="UILayer/TopBar/HBox"]
+layout_mode = 2
+text = "存檔"
+
 [node name="StatusLabel" type="Label" parent="UILayer/TopBar/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3

@@ -42,6 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	if event.is_action_pressed("cancel"):
+		if is_inside_tree():
+			get_viewport().set_input_as_handled()
 		hide_menu()
 		action_selected.emit("cancel")
-		get_viewport().set_input_as_handled()

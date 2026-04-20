@@ -4,6 +4,7 @@ extends Control
 
 const EventPopupRes := preload("res://scenes/world_map/event_popup.tscn")
 const ShopPopupRes := preload("res://scenes/world_map/shop_popup.tscn")
+const SaveLoadScene := preload("res://scenes/ui/save_load_screen.tscn")
 
 const NODE_SIZE := Vector2(64, 64)
 
@@ -35,9 +36,23 @@ func _ready() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	enter_button.pressed.connect(_on_enter_pressed)
 	info_panel.visible = false
+
+	# 若有存檔按鈕/暫停按鈕，連接
+	var save_btn := get_node_or_null("UILayer/TopBar/HBox/SaveButton") as Button
+	if save_btn:
+		save_btn.pressed.connect(_on_save_pressed)
+
 	_load_map_data()
 	_build_map()
 	_refresh_status()
+
+	# 自動存檔（回到世界地圖即自動存）
+	SaveManager.auto_save()
+
+func _on_save_pressed() -> void:
+	if SaveLoadScreen.is_open():
+		return
+	SaveLoadScreen.open_singleton(self, SaveLoadScene, SaveLoadScreen.Mode.SAVE)
 
 func _load_map_data() -> void:
 	var path := "res://data/world_map.json"
@@ -217,19 +232,21 @@ func _on_enter_pressed() -> void:
 			_open_shop(data)
 
 func _open_event(data: Dictionary) -> void:
-	var popup := EventPopupRes.instantiate()
-	add_child(popup)
+	# 關閉同層級的其他選單
+	ShopPopup.close_if_open()
+	if EventPopup.is_open():
+		return
+	var popup := EventPopup.open_singleton(self, EventPopupRes, data.get("title", ""))
 	popup.closed.connect(func(): _on_node_completed(data["id"]))
-	popup.show_event(data.get("title", ""))
 
 func _open_shop(data: Dictionary) -> void:
-	var popup := ShopPopupRes.instantiate()
-	add_child(popup)
-	popup.closed.connect(func():
-		# 商店不算完成，可以重複進入；但第一次進入也標記
-		pass
-	)
-	popup.show_shop(data.get("title", ""))
+	# 關閉同層級的其他選單
+	EventPopup.close_if_open()
+	if ShopPopup.is_open():
+		return
+	var popup := ShopPopup.open_singleton(self, ShopPopupRes, data.get("title", ""))
+	# 確認離開後標記此節點為通關
+	popup.closed.connect(func(): _on_node_completed(data["id"]))
 
 func _on_node_completed(node_id: String) -> void:
 	StoryManager.complete_chapter(node_id)

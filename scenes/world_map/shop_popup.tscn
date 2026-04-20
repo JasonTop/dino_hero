@@ -2,21 +2,25 @@
 
 [ext_resource type="Script" path="res://scripts/world_map/shop_popup.gd" id="1_shop"]
 
-[node name="ShopPopup" type="Control"]
+[node name="ShopPopup" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_shop")
+
+[node name="Root" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_shop")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="Root"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0, 0, 0, 0.6)
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="Root"]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -26,37 +30,81 @@ offset_left = -420.0
 offset_top = -280.0
 offset_right = 420.0
 offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
+[node name="VBox" type="VBoxContainer" parent="Root/Panel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Panel/VBox"]
+[node name="Title" type="Label" parent="Root/Panel/VBox"]
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 26
 text = "商店"
 
-[node name="GoldLabel" type="Label" parent="Panel/VBox"]
+[node name="GoldLabel" type="Label" parent="Root/Panel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
 theme_override_font_sizes/font_size = 16
 text = "擁有金幣：0"
 
-[node name="Scroll" type="ScrollContainer" parent="Panel/VBox"]
+[node name="Scroll" type="ScrollContainer" parent="Root/Panel/VBox"]
 custom_minimum_size = Vector2(0, 360)
 layout_mode = 2
 
-[node name="ListContainer" type="VBoxContainer" parent="Panel/VBox/Scroll"]
+[node name="ListContainer" type="VBoxContainer" parent="Root/Panel/VBox/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="ResultLabel" type="Label" parent="Panel/VBox"]
+[node name="ResultLabel" type="Label" parent="Root/Panel/VBox"]
 layout_mode = 2
 horizontal_alignment = 1
 text = ""
 
-[node name="CloseButton" type="Button" parent="Panel/VBox"]
+[node name="LeaveButton" type="Button" parent="Root/Panel/VBox"]
 layout_mode = 2
-text = "離開"
+theme_override_font_sizes/font_size = 18
+text = "離開商店"
+
+[node name="ConfirmPanel" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -80.0
+offset_right = 200.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/ConfirmPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Message" type="Label" parent="Root/ConfirmPanel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+text = "確定離開商店嗎？
+離開後將無法再次進入此節點。"
+
+[node name="HBox" type="HBoxContainer" parent="Root/ConfirmPanel/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="YesButton" type="Button" parent="Root/ConfirmPanel/VBox/HBox"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "確定"
+
+[node name="NoButton" type="Button" parent="Root/ConfirmPanel/VBox/HBox"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "取消"

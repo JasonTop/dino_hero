@@ -64,12 +64,22 @@ grow_horizontal = 2
 [node name="StartButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "開始戰鬥"
+text = "新遊戲"
+
+[node name="ContinueButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "繼續遊戲"
 
 [node name="DifficultyButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "難度：普通"
+
+[node name="DevModeToggle" type="CheckButton" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "開發模式"
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2

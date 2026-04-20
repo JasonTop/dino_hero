@@ -30,6 +30,19 @@ const DIFFICULTY_TABLE := {
 
 var current_difficulty: int = Difficulty.NORMAL
 
+## ===== 開發模式 =====
+## 僅在 debug build（編輯器/debug export）可用；release export 時強制關閉
+var dev_mode_enabled: bool = false
+
+func is_dev_mode_available() -> bool:
+	return OS.is_debug_build()
+
+func is_dev_mode_active() -> bool:
+	return is_dev_mode_available() and dev_mode_enabled
+
+func set_dev_mode(on: bool) -> void:
+	dev_mode_enabled = on and is_dev_mode_available()
+
 func change_scene(scene_path: String) -> void:
 	get_tree().change_scene_to_file(scene_path)
 

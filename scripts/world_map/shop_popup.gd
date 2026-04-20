@@ -1,15 +1,21 @@
 class_name ShopPopup
-extends Control
+extends CanvasLayer
 
 ## 商店 — 購買道具與裝備
+## 同時只有一個實例；離開時需確認，確認後視為通關此節點
 
 signal closed()
 
-@onready var title_label: Label = $Panel/VBox/Title
-@onready var gold_label: Label = $Panel/VBox/GoldLabel
-@onready var list_container: VBoxContainer = $Panel/VBox/Scroll/ListContainer
-@onready var result_label: Label = $Panel/VBox/ResultLabel
-@onready var close_button: Button = $Panel/VBox/CloseButton
+static var _active: ShopPopup = null
+
+@onready var title_label: Label = $Root/Panel/VBox/Title
+@onready var gold_label: Label = $Root/Panel/VBox/GoldLabel
+@onready var list_container: VBoxContainer = $Root/Panel/VBox/Scroll/ListContainer
+@onready var result_label: Label = $Root/Panel/VBox/ResultLabel
+@onready var leave_button: Button = $Root/Panel/VBox/LeaveButton
+@onready var confirm_panel: PanelContainer = $Root/ConfirmPanel
+@onready var confirm_yes: Button = $Root/ConfirmPanel/VBox/HBox/YesButton
+@onready var confirm_no: Button = $Root/ConfirmPanel/VBox/HBox/NoButton
 
 # 商店商品（item_id -> 價格）
 const STOCK := {
@@ -24,10 +30,34 @@ const STOCK := {
 	"ancient_amber": 400,
 }
 
+static func open_singleton(parent: Node, scene: PackedScene, shop_title: String) -> ShopPopup:
+	if _active != null and is_instance_valid(_active):
+		return _active
+	var inst: ShopPopup = scene.instantiate()
+	parent.add_child(inst)
+	inst.show_shop(shop_title)
+	return inst
+
+static func is_open() -> bool:
+	return _active != null and is_instance_valid(_active)
+
+static func close_if_open() -> void:
+	if _active != null and is_instance_valid(_active):
+		_active.queue_free()
+		_active = null
+
 func _ready() -> void:
-	close_button.pressed.connect(_on_close)
+	_active = self
+	leave_button.pressed.connect(_on_leave_pressed)
+	confirm_yes.pressed.connect(_on_confirm_yes)
+	confirm_no.pressed.connect(_on_confirm_no)
 	Inventory.gold_changed.connect(_refresh_gold)
 	result_label.text = ""
+	confirm_panel.visible = false
+
+func _exit_tree() -> void:
+	if _active == self:
+		_active = null
 
 func show_shop(shop_title: String) -> void:
 	title_label.text = shop_title
@@ -86,6 +116,14 @@ func _on_buy(item_id: String, price: int) -> void:
 		result_label.text = "金幣不足！"
 		result_label.modulate = Color(1, 0.4, 0.4)
 
-func _on_close() -> void:
+func _on_leave_pressed() -> void:
+	confirm_panel.visible = true
+	confirm_no.grab_focus()
+
+func _on_confirm_no() -> void:
+	confirm_panel.visible = false
+	leave_button.grab_focus()
+
+func _on_confirm_yes() -> void:
 	closed.emit()
 	queue_free()

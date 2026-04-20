@@ -156,6 +156,12 @@ func _end_battle(is_victory: bool) -> void:
 	hud.show_battle_result(is_victory)
 	battle_ended.emit(is_victory)
 
+## 開發模式：強制勝利
+func force_victory() -> void:
+	if current_phase == Phase.BATTLE_OVER:
+		return
+	_end_battle(true)
+
 ## ========== 游標事件 ==========
 
 func _on_cell_hovered(cell: Vector2i) -> void:

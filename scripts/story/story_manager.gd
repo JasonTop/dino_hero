@@ -66,3 +66,25 @@ func reset() -> void:
 	flags.clear()
 	completed_chapters.clear()
 	current_chapter = "ch01"
+
+## ===== 序列化 =====
+func to_dict() -> Dictionary:
+	return {
+		"alignment": alignment,
+		"flags": flags.duplicate(),
+		"completed_chapters": completed_chapters.duplicate(),
+		"current_chapter": current_chapter,
+	}
+
+func from_dict(d: Dictionary) -> void:
+	alignment = int(d.get("alignment", 0))
+	flags.clear()
+	var flags_data: Dictionary = d.get("flags", {})
+	for k in flags_data:
+		flags[str(k)] = flags_data[k]
+	completed_chapters.clear()
+	var completed: Array = d.get("completed_chapters", [])
+	for c in completed:
+		completed_chapters.append(str(c))
+	current_chapter = str(d.get("current_chapter", "ch01"))
+	alignment_changed.emit(alignment)

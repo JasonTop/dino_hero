@@ -1,15 +1,34 @@
 class_name EventPopup
-extends Control
+extends CanvasLayer
 
 ## 事件節點 — 隨機福利選擇
+## 同時僅一個實例
 
 signal closed()
 
-@onready var title_label: Label = $Panel/VBox/Title
-@onready var desc_label: Label = $Panel/VBox/Description
-@onready var options_container: VBoxContainer = $Panel/VBox/OptionsContainer
-@onready var result_label: Label = $Panel/VBox/ResultLabel
-@onready var close_button: Button = $Panel/VBox/CloseButton
+static var _active: EventPopup = null
+
+static func open_singleton(parent: Node, scene: PackedScene, event_title: String) -> EventPopup:
+	if _active != null and is_instance_valid(_active):
+		return _active
+	var inst: EventPopup = scene.instantiate()
+	parent.add_child(inst)
+	inst.show_event(event_title)
+	return inst
+
+static func is_open() -> bool:
+	return _active != null and is_instance_valid(_active)
+
+static func close_if_open() -> void:
+	if _active != null and is_instance_valid(_active):
+		_active.queue_free()
+		_active = null
+
+@onready var title_label: Label = $Root/Panel/VBox/Title
+@onready var desc_label: Label = $Root/Panel/VBox/Description
+@onready var options_container: VBoxContainer = $Root/Panel/VBox/OptionsContainer
+@onready var result_label: Label = $Root/Panel/VBox/ResultLabel
+@onready var close_button: Button = $Root/Panel/VBox/CloseButton
 
 var _rewards: Array = []  # 當前 roll 出的獎勵
 
@@ -17,9 +36,14 @@ const POSSIBLE_ITEMS := ["raw_meat", "fresh_fish", "ancient_nectar", "revive_her
 	"evolution_stone_s", "sharp_claw_ring", "hard_scale_armor", "swift_foot_band"]
 
 func _ready() -> void:
+	_active = self
 	close_button.pressed.connect(_on_close)
 	result_label.visible = false
 	close_button.visible = false
+
+func _exit_tree() -> void:
+	if _active == self:
+		_active = null
 
 func show_event(event_title: String) -> void:
 	title_label.text = event_title

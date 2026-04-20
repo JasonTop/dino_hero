@@ -103,4 +103,5 @@ func _unhandled_input(event: InputEvent) -> void:
 			next_indicator.visible = true
 		else:
 			line_finished.emit()
-		get_viewport().set_input_as_handled()
+		if is_inside_tree():
+			get_viewport().set_input_as_handled()

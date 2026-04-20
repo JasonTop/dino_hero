@@ -102,3 +102,71 @@ func _equipment_bonus(stat: String) -> int:
 	if item == null:
 		return 0
 	return item.stat_bonuses.get(stat, 0)
+
+## ===== 序列化 =====
+func to_dict() -> Dictionary:
+	return {
+		"display_name": display_name,
+		"species": species,
+		"class_type": class_type,
+		"hp_max": hp_max, "hp": hp,
+		"mp_max": mp_max, "mp": mp,
+		"attack": attack, "defense": defense,
+		"magic_attack": magic_attack, "magic_defense": magic_defense,
+		"speed": speed, "movement": movement,
+		"attack_range_min": attack_range_min,
+		"attack_range_max": attack_range_max,
+		"level": level, "exp": exp,
+		"evolution_stage": evolution_stage,
+		"active_skill_ids": active_skill_ids,
+		"passive_skill_ids": passive_skill_ids,
+		"equipped_item_id": equipped_item_id,
+		"growth_hp": [growth_hp.x, growth_hp.y],
+		"growth_atk": [growth_atk.x, growth_atk.y],
+		"growth_def": [growth_def.x, growth_def.y],
+		"growth_matk": [growth_matk.x, growth_matk.y],
+		"growth_mdef": [growth_mdef.x, growth_mdef.y],
+		"growth_spd": [growth_spd.x, growth_spd.y],
+	}
+
+static func from_dict(d: Dictionary) -> UnitStats:
+	var s := UnitStats.new()
+	s.display_name = d.get("display_name", "")
+	s.species = d.get("species", "")
+	s.class_type = d.get("class_type", "striker")
+	s.hp_max = int(d.get("hp_max", 50))
+	s.hp = int(d.get("hp", s.hp_max))
+	s.mp_max = int(d.get("mp_max", 10))
+	s.mp = int(d.get("mp", s.mp_max))
+	s.attack = int(d.get("attack", 10))
+	s.defense = int(d.get("defense", 5))
+	s.magic_attack = int(d.get("magic_attack", 5))
+	s.magic_defense = int(d.get("magic_defense", 5))
+	s.speed = int(d.get("speed", 10))
+	s.movement = int(d.get("movement", 4))
+	s.attack_range_min = int(d.get("attack_range_min", 1))
+	s.attack_range_max = int(d.get("attack_range_max", 1))
+	s.level = int(d.get("level", 1))
+	s.exp = int(d.get("exp", 0))
+	s.evolution_stage = int(d.get("evolution_stage", 0))
+	var active: Array = d.get("active_skill_ids", [])
+	s.active_skill_ids = []
+	for a in active:
+		s.active_skill_ids.append(str(a))
+	var passive: Array = d.get("passive_skill_ids", [])
+	s.passive_skill_ids = []
+	for p in passive:
+		s.passive_skill_ids.append(str(p))
+	s.equipped_item_id = str(d.get("equipped_item_id", ""))
+	s.growth_hp = _v2i(d.get("growth_hp", [3, 5]))
+	s.growth_atk = _v2i(d.get("growth_atk", [2, 3]))
+	s.growth_def = _v2i(d.get("growth_def", [1, 2]))
+	s.growth_matk = _v2i(d.get("growth_matk", [1, 2]))
+	s.growth_mdef = _v2i(d.get("growth_mdef", [1, 2]))
+	s.growth_spd = _v2i(d.get("growth_spd", [1, 2]))
+	return s
+
+static func _v2i(arr: Array) -> Vector2i:
+	if arr.size() >= 2:
+		return Vector2i(int(arr[0]), int(arr[1]))
+	return Vector2i(1, 1)

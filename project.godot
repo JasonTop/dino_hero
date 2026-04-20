@@ -28,6 +28,8 @@ ItemDatabase="*res://scripts/items/item_database.gd"
 Inventory="*res://scripts/items/inventory.gd"
 StoryManager="*res://scripts/story/story_manager.gd"
 ChapterDatabase="*res://scripts/story/chapter_database.gd"
+PartyManager="*res://scripts/core/party_manager.gd"
+SaveManager="*res://scripts/core/save_manager.gd"
 
 [display]
 
