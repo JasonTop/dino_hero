@@ -445,13 +445,26 @@ func _on_skill_selected(skill: Skill) -> void:
 			player_state = PlayerState.CHOOSING_SKILL_TARGET
 			cursor.set_active(true)
 			tile_highlighter.show_attack_range(_attack_cells)
-		_:
-			# AOE 簡化：先不支援，退回選單
-			_show_action_menu()
+		Skill.TargetType.AOE_ENEMIES, Skill.TargetType.AOE_ALLIES, Skill.TargetType.AOE_ALL:
+			# range_max == 0 → 以施術者為中心，直接釋放
+			if skill.range_max == 0:
+				_execute_aoe_skill(selected_unit, skill, selected_unit.cell)
+			else:
+				_attack_cells = pathfinder.get_attack_range(selected_unit.cell, skill.range_min, skill.range_max)
+				_attack_cells.append(selected_unit.cell)
+				player_state = PlayerState.CHOOSING_SKILL_TARGET
+				cursor.set_active(true)
+				tile_highlighter.show_attack_range(_attack_cells)
 
 func _handle_skill_target_select(cell: Vector2i) -> void:
 	if not (cell in _attack_cells):
 		return
+
+	# AOE：以點擊的格子為中心
+	if _pending_skill.target_type in [Skill.TargetType.AOE_ENEMIES, Skill.TargetType.AOE_ALLIES, Skill.TargetType.AOE_ALL]:
+		_execute_aoe_skill(selected_unit, _pending_skill, cell)
+		return
+
 	var target = battle_map.get_unit_at(cell)
 	if target == null:
 		return
@@ -482,6 +495,95 @@ func _execute_self_skill(caster: Unit, skill: Skill) -> void:
 	caster.end_action()
 	_deselect_unit()
 	_check_player_turn_end()
+
+## AOE 技能：以 center_cell 為中心、aoe_radius 為半徑（曼哈頓距離）
+func _execute_aoe_skill(caster: Unit, skill: Skill, center_cell: Vector2i) -> void:
+	player_state = PlayerState.ATTACKING
+	cursor.set_active(false)
+	tile_highlighter.clear_all()
+
+	caster.stats.mp = maxi(caster.stats.mp - skill.mp_cost, 0)
+
+	var radius: int = maxi(skill.aoe_radius, 0)
+	var affected_cells: Array[Vector2i] = []
+	for dx in range(-radius, radius + 1):
+		for dy in range(-radius, radius + 1):
+			if absi(dx) + absi(dy) > radius:
+				continue
+			var c := center_cell + Vector2i(dx, dy)
+			if battle_map.is_within_bounds(c):
+				affected_cells.append(c)
+
+	# 視覺：高亮受影響範圍
+	tile_highlighter.show_attack_range(affected_cells)
+	_show_floating_text(caster, skill.display_name + "!")
+
+	# 收集目標
+	var targets: Array[Unit] = []
+	for c in affected_cells:
+		var u = battle_map.get_unit_at(c)
+		if u == null or not u.is_alive():
+			continue
+		match skill.target_type:
+			Skill.TargetType.AOE_ENEMIES:
+				if u.team != caster.team:
+					targets.append(u)
+			Skill.TargetType.AOE_ALLIES:
+				if u.team == caster.team:
+					targets.append(u)
+			Skill.TargetType.AOE_ALL:
+				targets.append(u)
+
+	# 對每個目標套用效果
+	var total_exp_gained := 0
+	var killed_count := 0
+	for target in targets:
+		match skill.skill_type:
+			Skill.SkillType.PHYSICAL, Skill.SkillType.MAGICAL:
+				for i in range(skill.hit_count):
+					if not target.is_alive():
+						break
+					var result := damage_calculator.calculate_skill_damage(caster, target, skill)
+					_show_damage_popup(target, result)
+					if result["is_hit"]:
+						target.take_damage(result["damage"])
+						if skill.status_effect != "" and target.is_alive():
+							target.apply_status(skill.status_effect, skill.status_duration)
+						if not target.is_alive():
+							killed_count += 1
+					await get_tree().create_timer(0.1).timeout
+			Skill.SkillType.HEAL:
+				var amount := skill.heal_amount
+				if skill.heal_ratio > 0.0:
+					amount += roundi(caster.stats.get_effective_magic_attack() * skill.heal_ratio)
+				target.heal(amount)
+				_show_heal_popup(target, amount)
+			Skill.SkillType.BUFF, Skill.SkillType.DEBUFF:
+				if skill.status_effect != "":
+					target.apply_status(skill.status_effect, skill.status_duration)
+				_show_floating_text(target, StatusEffectDatabase.get_display_name(skill.status_effect))
+
+		# 我方攻擊敵方單位計算經驗
+		if caster.team == Unit.Team.PLAYER and target.team != Unit.Team.PLAYER:
+			if skill.skill_type in [Skill.SkillType.PHYSICAL, Skill.SkillType.MAGICAL]:
+				var killed := not target.is_alive()
+				var exp_amount := ExpSystem.calc_exp_gained(caster, target, killed)
+				total_exp_gained += exp_amount
+
+	if total_exp_gained > 0:
+		_show_floating_text(caster, "+%d EXP" % total_exp_gained)
+		var level_ups := ExpSystem.grant_exp(caster, total_exp_gained)
+		if not level_ups.is_empty():
+			_pending_level_ups.append({"unit": caster, "level_ups": level_ups})
+
+	await get_tree().create_timer(0.4).timeout
+	tile_highlighter.clear_all()
+
+	caster.end_action()
+	_deselect_unit()
+	_check_battle_end()
+	if current_phase != Phase.BATTLE_OVER:
+		_wait_for_level_ups_then(func(): _check_player_turn_end())
 
 func _execute_skill_on_target(caster: Unit, skill: Skill, target: Unit) -> void:
 	player_state = PlayerState.ATTACKING

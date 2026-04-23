@@ -133,12 +133,31 @@ func _apply_reward(reward: Dictionary) -> void:
 		"gold":
 			Inventory.add_gold(reward.get("amount", 0))
 		"exp":
-			# 給予全隊經驗（透過 StoryManager 暫存旗標，下場戰鬥時使用 / 或直接套用已知隊伍）
-			# 簡化：存到全域旗標，由下場戰鬥讀取。此處只是示意。
-			var current: int = int(StoryManager.get_flag("pending_exp", 0))
-			StoryManager.set_flag("pending_exp", current + reward.get("amount", 0))
+			# 全隊立即獲得經驗
+			var amount: int = int(reward.get("amount", 0))
+			var level_ups := PartyManager.grant_exp_all(amount)
+			if not level_ups.is_empty():
+				reward["display"] += _format_level_ups(level_ups)
 		"level_up":
-			StoryManager.set_flag("pending_free_levelup", int(StoryManager.get_flag("pending_free_levelup", 0)) + 1)
+			# 隨機選一名成員免費升級
+			if PartyManager.members.is_empty():
+				return
+			var member: UnitStats = PartyManager.members[randi() % PartyManager.members.size()]
+			var prev_level := member.level
+			UnitData.apply_level_up(member)
+			reward["display"] = "%s 升級了！Lv.%d → Lv.%d" % [
+				member.display_name, prev_level, member.level
+			]
+
+func _format_level_ups(level_ups: Array) -> String:
+	if level_ups.is_empty():
+		return ""
+	var lines: Array[String] = ["\n\n升級："]
+	for entry: Dictionary in level_ups:
+		var stats: UnitStats = entry["stats"]
+		var count: int = (entry["level_ups"] as Array).size()
+		lines.append("  %s +%d 級 → Lv.%d" % [stats.display_name, count, stats.level])
+	return "\n".join(lines)
 
 func _on_close() -> void:
 	closed.emit()

@@ -69,7 +69,7 @@ static func create_stats(dino_type: DinoType, dino_name: String = "", lv: int = 
 				55, 16, 13, 8, 7, 7, 13, 5, 1, 1)
 			_set_growth(stats, Vector2i(4, 5), Vector2i(2, 3), Vector2i(2, 3),
 				Vector2i(1, 2), Vector2i(1, 2), Vector2i(1, 2))
-			stats.active_skill_ids = ["claw_combo"] as Array[String]
+			stats.active_skill_ids = ["claw_combo", "rending_swipe"] as Array[String]
 			stats.passive_skill_ids = ["pack_hunt"] as Array[String]
 
 		# ===== 坦克型 =====
@@ -142,7 +142,7 @@ static func create_stats(dino_type: DinoType, dino_name: String = "", lv: int = 
 				50, 16, 5, 8, 14, 12, 8, 5, 1, 2)
 			_set_growth(stats, Vector2i(3, 5), Vector2i(1, 1), Vector2i(1, 2),
 				Vector2i(2, 3), Vector2i(2, 3), Vector2i(1, 2))
-			stats.active_skill_ids = ["heal_lick"] as Array[String]
+			stats.active_skill_ids = ["heal_lick", "nurture_call"] as Array[String]
 
 	# 套用等級（從 Lv.1 升到 lv）
 	if lv > 1:

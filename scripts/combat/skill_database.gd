@@ -53,7 +53,7 @@ func _register_all_skills() -> void:
 		"id": "intimidate", "name": "恐嚇咆哮",
 		"desc": "周圍 2 格敵人 ATK/DEF -15%，持續 3 回合",
 		"type": Skill.SkillType.DEBUFF, "target": Skill.TargetType.AOE_ENEMIES,
-		"mp": 12, "range_max": 2, "aoe": 2, "status": "intimidate", "duration": 3,
+		"mp": 12, "range_max": 0, "aoe": 2, "status": "intimidate", "duration": 3,
 	})
 	_register({
 		"id": "bite_crush", "name": "噬咬粉碎",
@@ -90,6 +90,22 @@ func _register_all_skills() -> void:
 		"type": Skill.SkillType.MAGICAL, "target": Skill.TargetType.SINGLE_ENEMY,
 		"mp": 8, "range_max": 2, "mult": 0.9,
 		"status": "blind", "duration": 2,
+	})
+
+	# ===== 群體治療（慈母龍）=====
+	_register({
+		"id": "nurture_call", "name": "母性呼喚",
+		"desc": "範圍內所有友軍回復 HP (MATK * 1.0)",
+		"type": Skill.SkillType.HEAL, "target": Skill.TargetType.AOE_ALLIES,
+		"mp": 18, "range_max": 2, "aoe": 1, "heal_ratio": 1.0,
+	})
+
+	# ===== 群體爪擊（猶他盜龍）=====
+	_register({
+		"id": "rending_swipe", "name": "撕裂橫掃",
+		"desc": "範圍 1 格內敵人物理傷害 90%",
+		"type": Skill.SkillType.PHYSICAL, "target": Skill.TargetType.AOE_ENEMIES,
+		"mp": 14, "range_max": 0, "aoe": 1, "mult": 0.9,
 	})
 
 func _register(d: Dictionary) -> void:
